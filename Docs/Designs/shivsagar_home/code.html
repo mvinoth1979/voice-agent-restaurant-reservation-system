@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shivsagar - Modern Indian Cuisine</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Outfit:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-container": "#003d0b",
+                      "on-error": "#ffffff",
+                      "primary-container": "#f47920",
+                      "inverse-on-surface": "#f3f0f0",
+                      "primary-fixed-dim": "#ffb68d",
+                      "inverse-primary": "#ffb68d",
+                      "error-container": "#ffdad6",
+                      "surface": "#fcf9f8",
+                      "surface-container-highest": "#e4e2e1",
+                      "on-secondary-container": "#fffbff",
+                      "surface-alt": "#F5F2ED",
+                      "on-primary-container": "#572400",
+                      "surface-dim": "#dcd9d9",
+                      "tertiary-container": "#5ead5b",
+                      "surface-bright": "#fcf9f8",
+                      "secondary": "#b6171e",
+                      "on-secondary-fixed": "#410003",
+                      "secondary-fixed": "#ffdad6",
+                      "tertiary-fixed-dim": "#88d982",
+                      "primary-fixed": "#ffdbc9",
+                      "surface-container-low": "#f6f3f2",
+                      "muted-text": "#757575",
+                      "surface-tint": "#9a4600",
+                      "on-background": "#1b1c1c",
+                      "on-surface-variant": "#574237",
+                      "on-surface": "#1b1c1c",
+                      "on-primary-fixed-variant": "#763300",
+                      "outline-variant": "#dec0b1",
+                      "on-primary-fixed": "#321200",
+                      "surface-variant": "#e4e2e1",
+                      "inverse-surface": "#303030",
+                      "background": "#FDFBF7",
+                      "on-secondary": "#ffffff",
+                      "tertiary": "#1b6d24",
+                      "on-primary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "error": "#ba1a1a",
+                      "surface-container-high": "#eae7e7",
+                      "primary": "#9a4600",
+                      "outline": "#8b7265",
+                      "on-secondary-fixed-variant": "#930010",
+                      "on-tertiary-fixed-variant": "#005312",
+                      "tertiary-fixed": "#a3f69c",
+                      "secondary-container": "#da3433",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-fixed": "#002204",
+                      "surface-container": "#f0eded",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#ffb3ac"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "32px",
+                      "gutter": "24px",
+                      "stack-md": "16px",
+                      "margin-mobile": "16px",
+                      "stack-lg": "32px",
+                      "container-max": "1200px",
+                      "stack-sm": "8px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Outfit"
+                      ],
+                      "display-lg": [
+                              "Outfit"
+                      ],
+                      "headline-lg": [
+                              "Outfit"
+                      ],
+                      "headline-md": [
+                              "Outfit"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "reservation-code": [
+                              "Outfit"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "reservation-code": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .shadow-ambient {
+            box-shadow: 0 4px 24px rgba(45, 45, 45, 0.08);
+        }
+        
+        .shadow-interactive {
+            box-shadow: 0 2px 0 rgba(45, 45, 45, 0.15);
+        }
+        
+        .shadow-interactive:active {
+            box-shadow: 0 0 0 rgba(45, 45, 45, 0.15);
+            transform: translateY(2px);
+        }
+        
+        /* Glassmorphism overlay for Voice Modal Phase */
+        .glass-overlay {
+            backdrop-filter: blur(12px);
+            background-color: rgba(45, 45, 45, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md antialiased selection:bg-primary-container selection:text-white min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface shadow-sm sticky top-0 z-50 transition-transform duration-150 docked full-width bg-surface/80 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
+<!-- Brand Logo -->
+<a class="font-headline-md text-headline-md font-bold text-primary" href="#">Shivsagar</a>
+<!-- Navigation Links (Web) -->
+<nav class="hidden md:flex items-center gap-gutter">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low px-3 py-2 rounded-md" href="#menu">Menu</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low px-3 py-2 rounded-md" href="#location">Location</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low px-3 py-2 rounded-md" href="#gallery">Gallery</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low px-3 py-2 rounded-md" href="#about">About</a>
+</nav>
+<!-- Trailing Action -->
+<button class="hidden md:flex items-center gap-2 bg-primary-container text-white px-4 py-2 rounded-lg font-label-md text-label-md shadow-interactive transition-all duration-200" onclick="toggleVoiceModal()">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">mic</span>
+                Book with Voice
+            </button>
+<!-- Mobile Menu Toggle -->
+<button class="md:hidden text-on-surface-variant p-2 hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full">
+<!-- Hero Section -->
+<section class="relative w-full px-margin-mobile md:px-margin-desktop py-stack-lg md:py-24 max-w-container-max mx-auto flex flex-col md:flex-row items-center gap-gutter overflow-hidden">
+<!-- Hero Text -->
+<div class="w-full md:w-1/2 flex flex-col gap-stack-md z-10">
+<div class="inline-flex items-center gap-2 bg-surface-alt px-3 py-1.5 rounded-full w-fit mb-4 border border-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-muted-text">lock</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Zero-PII: No Phone or Email Required</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface">Modern Indian<br/><span class="text-primary-container">Effortless Dining.</span></h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md mt-2 mb-6">
+                    Experience vibrant flavors with zero friction. Tap below to speak with our AI host and secure your table instantly.
+                </p>
+<!-- Prominent Voice Banner -->
+<button class="group relative w-full md:w-auto bg-primary-container text-white rounded-xl p-6 flex flex-col items-center justify-center gap-3 shadow-ambient shadow-interactive transition-all duration-300 hover:bg-[#E06A1A] overflow-hidden" onclick="toggleVoiceModal()">
+<div class="absolute inset-0 bg-white/10 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500 ease-out"></div>
+<span class="material-symbols-outlined text-[48px] animate-pulse" style="font-variation-settings: 'FILL' 1;">mic</span>
+<span class="font-headline-md text-headline-md font-bold z-10">Book with Voice (No Sign-up)</span>
+<span class="font-label-md text-label-md opacity-80 z-10">Tap to start speaking</span>
+</button>
+</div>
+<!-- Hero Image Bento -->
+<div class="w-full md:w-1/2 grid grid-cols-2 grid-rows-2 gap-4 h-[400px] md:h-[500px]">
+<div class="col-span-2 row-span-1 rounded-2xl overflow-hidden shadow-ambient bg-surface-container">
+<img alt="Restaurant Interior" class="w-full h-full object-cover" data-alt="A bright, modern Indian restaurant interior during daytime. The space features clean lines, off-white walls, and natural wood furniture. Warm saffron orange accents are visible in the subtle decor and upholstery. Sunlight streams through large windows, creating a vibrant, inviting atmosphere that perfectly balances high-tech minimalism with traditional hospitality warmth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_lNedg9QDQ8JfzP2sjRF0Zrl8NMT9YsadG1qj7Ex8eFSybD2OcZ_IlkDpNfeSqJ7NolNi_EYtfNLapnLf6ggAySGwN9WXjiN9Ot83NlIsUsu35a-d6VH8Rfu9j4YlzYI7w_j2NjOIegVR4LnQJCmFhl2NZ5GN6d732QxQUqP_U1mtVxNj99PuxnGpjH5IJkfdp0c9eH8bUgqu2oL4wSmAhYgZATFyWjUXnsOhAfu_oxx1L25IzjWvB3y544LZw70g-3OP-tl5jUKL"/>
+</div>
+<div class="col-span-1 row-span-1 rounded-2xl overflow-hidden shadow-ambient bg-surface-container">
+<img alt="Plated Dish" class="w-full h-full object-cover" data-alt="A close-up shot of a beautifully plated modern Indian dish, perhaps a vibrant curry or delicate starter, resting on a clean white ceramic plate. The food features rich reds, deep greens, and saffron yellows. The lighting is studio-quality and crisp, resting on a minimalist off-white table surface. The composition emphasizes fresh ingredients and culinary precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjkxdaD-pfPt_ympwMnwe2lgTm2_oa8sSrbtPSR4otqmAcwo4av-vILqz3n5lybrznzaE0wCLpMo1N2lkT4I8QcNO2C07t7tQ3_3YqpzV7brdIfNXcEVwCUpb_DC4dkQlxjkls-jE-IYsmhKLpAxQblbngOvehwC13nxHQ6ND_crJZlUzVNSIrGB2eBSlJMCN1QsEmVG0v128vLvjqz6nlHxgwJ23bkS68hYQQF_5IqPSXqVi2EKjmD7lvrxFYFpijlOD2nrGxegRV"/>
+</div>
+<div class="col-span-1 row-span-1 rounded-2xl overflow-hidden shadow-ambient bg-surface-container flex items-center justify-center p-6 text-center">
+<div>
+<span class="material-symbols-outlined text-primary-container text-[40px] mb-2" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<h3 class="font-headline-lg text-headline-lg font-bold text-on-surface">Fast.</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Table in seconds.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Menu Preview -->
+<section class="w-full bg-surface-alt py-24" id="menu">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-bold">Curated Signatures</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">A glimpse into our modern Indian kitchen.</p>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary-container hover:text-[#E06A1A] transition-colors" href="#">
+                        Full Menu <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Menu Item 1 -->
+<div class="bg-white rounded-xl overflow-hidden shadow-ambient group cursor-pointer">
+<div class="h-48 overflow-hidden">
+<img alt="Samosa Chaat" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="An overhead view of a deconstructed modern Samosa Chaat served in a minimalist shallow white bowl. The dish features vibrant layers of mint chutney, sweet tamarind, and creamy yogurt drizzled artistically over crispy golden pastry fragments. The background is a clean off-white surface, creating a high-contrast, appetizing aesthetic consistent with a contemporary dining experience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBK1wRB546iVbWVLB6xgfu4dmfwr20F0wU1AZpP_EvIf7lFPpw7BpjsPZyOLC1TnK1hOpd3AdLxMeGshT1yD985S2trzXvHdiFm2Rd6awEd6_689e2GQv6SpbQpY-0YjcGQrc-gRgXI5PxjJ-dEivQ3zUI0mfm_BuxjkrFEwOLnYvPB9yZt5FEVRaRLsyli8UqHJUAggZK0IeroHS3HC8qYA4m2ZM4Cj1uA2hq2kDnHbVgU1o9CoWhYxg0rv7naMdeGztfUypna3ypC"/>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">Samosa Tartlet</h3>
+<span class="font-label-md text-label-md text-primary-container">$12</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Spiced potato, mint emulsion, tamarind glaze in a crisp shell.</p>
+</div>
+</div>
+<!-- Menu Item 2 -->
+<div class="bg-white rounded-xl overflow-hidden shadow-ambient group cursor-pointer">
+<div class="h-48 overflow-hidden">
+<img alt="Biryani" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A steaming copper handi filled with aromatic saffron-infused Biryani rice. The grains are perfectly separated, garnished with caramelized onions and fresh cilantro. The pot sits on a minimalist gray slate table with a soft, diffused lighting setup that highlights the texture and rich colors of the saffron and spices. The mood is warm and inviting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB6_NB9D7WDjUTm262oQ0y2_L8th-LvZhVqt3JHkL3jZj4zi-9Yv5fXHlC9l1Uoge3Z5S7Wbwq3zjFq-aSNUpgJ14txdb2KAcDqCu6RgtVb-fQvhYX4pFi1US_jd_ZUBVeMsV9AtZJQ7nAgAG0zIXB0qeMBUZpzv-YBPmStL2xLjnGGJkAzef-tz_d657nSv433o4RQcoNQ0g_k3virZ49pN0WeM3oELBh-5OFY9qcPHt725x6kqpPTTyS6W0Gfl0ZC5rOX2ukHtdp"/>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">Saffron Dum Biryani</h3>
+<span class="font-label-md text-label-md text-primary-container">$24</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Aged basmati, slow-cooked root vegetables, saffron infusion.</p>
+</div>
+</div>
+<!-- Menu Item 3 -->
+<div class="bg-white rounded-xl overflow-hidden shadow-ambient group cursor-pointer">
+<div class="h-48 overflow-hidden">
+<img alt="Paneer Tikka" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Three cubes of vividly charred Paneer Tikka presented elegantly on a long rectangular white plate. The paneer is coated in a deep red tandoori marinade. A delicate swipe of vibrant green mint chutney decorates the side of the plate. The composition is asymmetrical and modern, photographed under bright, high-key lighting to emphasize cleanliness and premium quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpd4lZyO1NJ2YMdQ24_arK7H2-K_NU3n-TfRMkRFb4WxR5y-uYAs0tYLfcSNIOX0P-JV0auDpHFwr4jwFlIve7m9U80cb37RX6HR2-HkSmJLowrCDxGehnFUUkDXM4oYWaYypdZMkUfO7MZmnCPfTVyRkpyx8ypzLhKWbH9S7XyZkHxJbali5T1KB_5vNzV-ckRdyLgIuem7MzM3mi0ZjR_Z2UEOvwf2gEiRojR3_1Dg0gDnln4G38WeN3cv9YD8CdcSyRQ721n0Cg"/>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">Charcoal Paneer</h3>
+<span class="font-label-md text-label-md text-primary-container">$18</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Smoked cottage cheese, robust pepper marinade, micro-greens.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest py-stack-lg px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-gutter max-w-container-max mx-auto w-full border-t border-outline-variant flat no shadows mt-auto">
+<div class="font-headline-md text-headline-md font-bold text-primary">Shivsagar</div>
+<div class="text-center md:text-left">
+<p class="font-body-md text-body-md text-on-surface">© 2024 Shivsagar. Zero-PII: No Phone or Email Required.</p>
+</div>
+<nav class="flex gap-4">
+<a class="font-label-md text-label-md text-muted-text hover:text-primary hover:underline transition-all focus:outline-none focus:ring-2 focus:ring-primary rounded" href="#">Privacy Policy</a>
+<a class="font-label-md text-label-md text-muted-text hover:text-primary hover:underline transition-all focus:outline-none focus:ring-2 focus:ring-primary rounded" href="#">Terms of Service</a>
+<a class="font-label-md text-label-md text-muted-text hover:text-primary hover:underline transition-all focus:outline-none focus:ring-2 focus:ring-primary rounded" href="#">Contact Us</a>
+</nav>
+</footer>
+<!-- Voice Booking Modal (Hidden by default) -->
+<div class="fixed inset-0 z-[100] hidden flex-col items-center justify-center p-margin-mobile" id="voiceModal">
+<!-- Backdrop -->
+<div class="absolute inset-0 glass-overlay" onclick="toggleVoiceModal()"></div>
+<!-- Modal Content -->
+<div class="relative w-full max-w-[480px] bg-white rounded-2xl shadow-ambient p-8 flex flex-col items-center text-center transform transition-transform duration-300 scale-95 opacity-0" id="voiceModalContent">
+<button class="absolute top-4 right-4 text-muted-text hover:text-on-surface transition-colors p-2 rounded-full hover:bg-surface-alt" onclick="toggleVoiceModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+<div class="inline-flex items-center gap-1 bg-surface-alt px-3 py-1 rounded-full mb-6">
+<span class="material-symbols-outlined text-[14px] text-muted-text">lock</span>
+<span class="font-label-md text-label-md text-on-surface-variant text-xs">Zero-PII Active</span>
+</div>
+<!-- Waveform Visualizer Placeholder (Phase 2 concept) -->
+<div class="w-24 h-24 bg-primary-container rounded-full mb-8 flex items-center justify-center shadow-ambient animate-pulse relative overflow-hidden">
+<div class="absolute inset-0 bg-white/20 scale-150 animate-ping rounded-full"></div>
+<span class="material-symbols-outlined text-white text-[40px] z-10" style="font-variation-settings: 'FILL' 1;">mic</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg font-bold text-on-surface mb-2">Listening...</h3>
+<!-- Transcription Log Style -->
+<div class="w-full bg-surface-alt rounded-lg p-4 min-h-[80px] flex items-center justify-center border border-surface-variant mb-8">
+<p class="font-body-md text-body-md text-on-surface-variant animate-pulse">"I'd like a table for 2 tonight at 7 PM..."</p>
+</div>
+<!-- Action Buttons -->
+<div class="w-full flex gap-4">
+<button class="flex-1 border-2 border-on-surface text-on-surface font-label-md text-label-md py-3 rounded-lg hover:bg-surface-alt transition-colors shadow-interactive">Cancel</button>
+<button class="flex-1 bg-primary-container text-white font-label-md text-label-md py-3 rounded-lg hover:bg-[#E06A1A] transition-colors shadow-interactive">Confirm Details</button>
+</div>
+</div>
+</div>
+<!-- Micro-interaction Scripts -->
+<script>
+        function toggleVoiceModal() {
+            const modal = document.getElementById('voiceModal');
+            const content = document.getElementById('voiceModalContent');
+            
+            if (modal.classList.contains('hidden')) {
+                // Open
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                // Small delay to allow display:flex to apply before animating opacity/transform
+                setTimeout(() => {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                // Close
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+                // Wait for animation to finish before hiding
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }, 300);
+            }
+        }
+    </script>
+</body></html>

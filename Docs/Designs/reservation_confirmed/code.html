@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reservation Confirmed - Shivsagar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Outfit:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#003d0b",
+                        "on-error": "#ffffff",
+                        "primary-container": "#f47920",
+                        "inverse-on-surface": "#f3f0f0",
+                        "primary-fixed-dim": "#ffb68d",
+                        "inverse-primary": "#ffb68d",
+                        "error-container": "#ffdad6",
+                        "surface": "#fcf9f8",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-secondary-container": "#fffbff",
+                        "surface-alt": "#F5F2ED",
+                        "on-primary-container": "#572400",
+                        "surface-dim": "#dcd9d9",
+                        "tertiary-container": "#5ead5b",
+                        "surface-bright": "#fcf9f8",
+                        "secondary": "#b6171e",
+                        "on-secondary-fixed": "#410003",
+                        "secondary-fixed": "#ffdad6",
+                        "tertiary-fixed-dim": "#88d982",
+                        "primary-fixed": "#ffdbc9",
+                        "surface-container-low": "#f6f3f2",
+                        "muted-text": "#757575",
+                        "surface-tint": "#9a4600",
+                        "on-background": "#1b1c1c",
+                        "on-surface-variant": "#574237",
+                        "on-surface": "#1b1c1c",
+                        "on-primary-fixed-variant": "#763300",
+                        "outline-variant": "#dec0b1",
+                        "on-primary-fixed": "#321200",
+                        "surface-variant": "#e4e2e1",
+                        "inverse-surface": "#303030",
+                        "background": "#FDFBF7",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#1b6d24",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#eae7e7",
+                        "primary": "#9a4600",
+                        "outline": "#8b7265",
+                        "on-secondary-fixed-variant": "#930010",
+                        "on-tertiary-fixed-variant": "#005312",
+                        "tertiary-fixed": "#a3f69c",
+                        "secondary-container": "#da3433",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed": "#002204",
+                        "surface-container": "#f0eded",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#ffb3ac",
+                        "success": "#2E7D32" 
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "32px",
+                        "gutter": "24px",
+                        "stack-md": "16px",
+                        "margin-mobile": "16px",
+                        "stack-lg": "32px",
+                        "container-max": "1200px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "headline-lg": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "body-lg": ["Inter"],
+                        "reservation-code": ["Outfit"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "reservation-code": ["36px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-overlay {
+            background-color: rgba(28, 28, 28, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md antialiased relative">
+<!-- Mock Background for context (Homepage beneath modal) -->
+<div class="absolute inset-0 z-0 bg-cover bg-center" data-alt="A modern Indian restaurant interior during daytime, filled with natural light. The setting is vibrant and clean with saffron orange and warm wood accents, representing a high-end dining experience. The scene conveys effortless hospitality and modern comfort." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDtAH-c7YnFYGmLkFitI1Wnyk1PjbhYW8jwZYk9RDHHNf8cxugICi0a5ch2agqxXTeg6tWn8pn-Utl1rI3ULlI44LHZbVrmjqfIzBQEeVMLQVrD-SOz0nSxbWIUkDb46kJyXR8baYese1fTaqjxGgDyhiAyTSkhh2dQ8N0eBBT5LSsAWW6tgHVOyuqTDdiz8LN0qEWdgLA9DtqT2HA3lHvc2qkA4ctNq7vJCDDWpOsLjEr6P21vjJzDW40YB9O7_Ckwg2sIYrmyV4Pv');"></div>
+<!-- Glassmorphism Overlay -->
+<div class="absolute inset-0 z-10 glass-overlay"></div>
+<!-- Main Content Container (Modal) -->
+<main class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop relative z-20">
+<!-- Success Modal -->
+<div class="bg-surface-container-lowest rounded-xl shadow-lg w-full max-w-[480px] overflow-hidden border border-surface-variant flex flex-col transform transition-all">
+<!-- Modal Header / Success Animation Area -->
+<div class="bg-[#2E7D32]/10 py-stack-lg flex flex-col items-center justify-center border-b border-[#2E7D32]/20">
+<div class="w-20 h-20 rounded-full bg-[#2E7D32] flex items-center justify-center mb-stack-md shadow-sm">
+<span class="material-symbols-outlined text-on-primary text-5xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface text-center px-margin-mobile">
+                    Table Reserved!
+                </h1>
+<p class="font-body-md text-body-md text-muted-text mt-stack-sm text-center px-margin-mobile">
+                    Your spot is secured instantly.
+                </p>
+</div>
+<!-- Modal Body -->
+<div class="p-stack-lg flex flex-col items-center gap-stack-lg">
+<!-- Reservation Code Badge -->
+<div class="w-full relative group">
+<div class="absolute inset-0 bg-[#2E7D32] rounded-lg transform translate-y-1 group-hover:translate-y-0 transition-transform duration-200"></div>
+<div class="relative bg-surface-container-lowest border-2 border-[#2E7D32] rounded-lg p-stack-md flex flex-col items-center justify-center cursor-pointer hover:-translate-y-1 transition-transform duration-200">
+<span class="font-label-md text-label-md text-[#2E7D32] uppercase tracking-widest mb-2">Show this code upon arrival</span>
+<div class="flex items-center gap-3">
+<span class="font-reservation-code text-reservation-code text-on-surface tracking-widest">TABLE-B99</span>
+<button class="p-2 rounded-full hover:bg-surface-variant transition-colors text-muted-text" title="Copy Code">
+<span class="material-symbols-outlined text-xl">content_copy</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Reservation Details Grid -->
+<div class="w-full grid grid-cols-2 gap-stack-md bg-surface-alt p-stack-md rounded-lg">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-muted-text mb-1">Date</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-lg text-primary">calendar_today</span>
+                            Oct 24, 2024
+                        </span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-muted-text mb-1">Time</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-lg text-primary">schedule</span>
+                            8:30 PM (IST)
+                        </span>
+</div>
+<div class="flex flex-col col-span-2 pt-2 border-t border-surface-variant mt-1">
+<span class="font-label-md text-label-md text-muted-text mb-1">Occasion</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-lg text-primary">celebration</span>
+                            Casual Dining (Party of 2)
+                        </span>
+</div>
+</div>
+<!-- Friendly Message -->
+<div class="text-center bg-surface-container-low p-stack-md rounded-lg w-full">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        We'll hold your table for <strong class="text-on-surface">15 minutes</strong> past your booking time. Have a great day!
+                    </p>
+</div>
+<!-- Privacy Badge -->
+<div class="inline-flex items-center gap-2 bg-surface-alt px-4 py-2 rounded-full border border-surface-variant">
+<span class="material-symbols-outlined text-sm text-muted-text">lock</span>
+<span class="font-label-md text-label-md text-muted-text">Zero-PII: No Phone or Email Required</span>
+</div>
+</div>
+<!-- Modal Actions -->
+<div class="p-stack-md bg-surface-container-low border-t border-surface-variant flex justify-center">
+<button class="bg-primary-container text-on-primary-container font-label-md text-label-md px-8 py-3 rounded-lg shadow-[0_2px_0_0_#763300] hover:shadow-none hover:translate-y-[2px] transition-all duration-200 flex items-center gap-2">
+<span class="material-symbols-outlined">home</span>
+                    Return to Home
+                </button>
+</div>
+</div>
+</main>
+</body></html>
