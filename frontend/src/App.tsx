@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAudioRecorder } from './hooks/useAudioRecorder';
+import { useAudioStreamer } from './hooks/useAudioStreamer';
 
 interface Message {
   sender: 'agent' | 'user';
@@ -35,6 +36,64 @@ export default function App() {
     stopRecording,
     clearRecording
   } = useAudioRecorder();
+
+  // Client live stream hook
+  const streamer = useAudioStreamer({
+    onTranscriptReceived: (tokenText) => {
+      setMessages(prev => {
+        const copy = [...prev];
+        if (copy.length > 0 && copy[copy.length - 1].sender === 'agent') {
+          const last = copy[copy.length - 1];
+          copy[copy.length - 1] = {
+            ...last,
+            text: last.text + tokenText
+          };
+        } else {
+          copy.push({
+            sender: 'agent',
+            text: tokenText,
+            timestamp: new Date()
+          });
+        }
+        return copy;
+      });
+      setVisualState('speaking');
+    },
+    onActionResultReceived: (data) => {
+      if (data.status === 'cancelled') {
+        setVisualState('greeting');
+        alert(`Reservation ${data.code} cancelled successfully.`);
+      } else if (data.status === 'rescheduled') {
+        setReservationData({
+          code: data.code,
+          date: data.date,
+          time: data.time_ist,
+          occasion: data.occasion || 'Standard Dining'
+        });
+        setVisualState('confirmed');
+        alert(`Reservation ${data.code} rescheduled successfully.`);
+      } else if (data.code) {
+        setReservationData({
+          code: data.code,
+          date: data.date,
+          time: data.time_ist,
+          occasion: data.occasion || 'Standard Dining'
+        });
+        setVisualState('confirmed');
+      }
+    },
+    onInterrupted: () => {
+      setVisualState('listening');
+    },
+    onReady: () => {
+      streamer.startRecording();
+      setVisualState('listening');
+    },
+    onError: (err) => {
+      console.error('[useAudioStreamer] Error:', err);
+      setVisualState('error');
+    }
+  });
 
   // Selected reservation details for success card
   const [reservationData, setReservationData] = useState({
@@ -73,24 +132,25 @@ export default function App() {
       }
     ]);
 
-    // Speak the greeting
-    try {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(greetingText);
-      utterance.onend = () => {
-        setVisualState(phaseMode === 'phase2' ? 'listening' : 'greeting');
-        if (phaseMode === 'phase2') {
-          startRecording();
-        }
-      };
-      utterance.onerror = (e) => {
-        console.error("Speech synthesis greeting error:", e);
-        setVisualState(phaseMode === 'phase2' ? 'listening' : 'greeting');
-      };
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {
-      console.error("Speech synthesis error on open:", e);
-      setVisualState('greeting');
+    if (phaseMode === 'phase2') {
+      streamer.connectStream();
+    } else {
+      // Speak the greeting
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(greetingText);
+        utterance.onend = () => {
+          setVisualState('greeting');
+        };
+        utterance.onerror = (e) => {
+          console.error("Speech synthesis greeting error:", e);
+          setVisualState('greeting');
+        };
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        console.error("Speech synthesis error on open:", e);
+        setVisualState('greeting');
+      }
     }
   };
 
@@ -104,6 +164,9 @@ export default function App() {
         currentAudioRef.current.pause();
         currentAudioRef.current = null;
       } catch (e) {}
+    }
+    if (phaseMode === 'phase2') {
+      streamer.disconnectStream();
     }
     setTimeout(() => {
       setModalOpen(false);
@@ -257,16 +320,20 @@ export default function App() {
     setMessages(prev => [...prev, { sender: 'user', text: userText, timestamp: new Date() }]);
     setTranscriptionInput('');
 
-    const historyPayload = messages.map(m => ({
-      role: m.sender === 'user' ? 'user' as const : 'model' as const,
-      parts: [{ text: m.text }]
-    }));
+    if (phaseMode === 'phase2') {
+      streamer.sendTextQuery(userText);
+    } else {
+      const historyPayload = messages.map(m => ({
+        role: m.sender === 'user' ? 'user' as const : 'model' as const,
+        parts: [{ text: m.text }]
+      }));
 
-    sendPayload({
-      text: userText,
-      conversation_history: JSON.stringify(historyPayload),
-      session_id: sessionId
-    });
+      sendPayload({
+        text: userText,
+        conversation_history: JSON.stringify(historyPayload),
+        session_id: sessionId
+      });
+    }
   };
 
   // Handle mock actions from verification panel
@@ -291,7 +358,11 @@ export default function App() {
         }
       ]);
     } else if (state === 'listening') {
-      startRecording();
+      if (phaseMode === 'phase2') {
+        streamer.startRecording();
+      } else {
+        startRecording();
+      }
     }
   };
 
@@ -701,11 +772,11 @@ export default function App() {
                       <div 
                         className="relative w-32 h-32 flex items-center justify-center cursor-pointer group"
                         onClick={() => {
-                          if (isRecording) {
-                            stopRecording();
+                          if (streamer.isRecording) {
+                            streamer.stopRecording();
                             setVisualState('speaking');
                           } else {
-                            startRecording();
+                            streamer.startRecording();
                             setVisualState('listening');
                           }
                         }}
@@ -716,21 +787,21 @@ export default function App() {
                         {/* Core orb */}
                         <div className="relative z-10 w-24 h-24 rounded-full bg-gradient-to-br from-primary-container to-secondary-container shadow-[0_4px_20px_rgba(244,121,32,0.4)] flex items-center justify-center overflow-hidden transition-all duration-200 group-hover:scale-105 active:scale-95">
                           {/* Animated Waveform */}
-                          <div className={`flex items-end justify-center gap-1.5 h-10 ${visualState === 'speaking' ? 'barge-in-active' : ''}`}>
+                          <div className={`flex items-end justify-center gap-1.5 h-10 ${streamer.isAgentSpeaking ? 'barge-in-active' : ''}`}>
                             <div 
                               className="waveform-bar w-1.5 bg-white/90 rounded-full" 
                               style={{ 
-                                height: isRecording ? '100%' : '10%',
-                                animationPlayState: isRecording ? 'running' : 'paused',
-                                transform: isRecording ? `scaleY(${volume / 100})` : 'scaleY(0.2)'
+                                height: streamer.isRecording ? '100%' : '10%',
+                                animationPlayState: streamer.isRecording ? 'running' : 'paused',
+                                transform: streamer.isRecording ? `scaleY(${streamer.volume / 100})` : 'scaleY(0.2)'
                               }}
                             ></div>
-                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-3/4" style={{ animationPlayState: isRecording ? 'running' : 'paused' }}></div>
-                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-full" style={{ animationPlayState: isRecording ? 'running' : 'paused' }}></div>
-                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-1/2" style={{ animationPlayState: isRecording ? 'running' : 'paused' }}></div>
-                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-full" style={{ animationPlayState: isRecording ? 'running' : 'paused' }}></div>
-                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-3/4" style={{ animationPlayState: isRecording ? 'running' : 'paused' }}></div>
-                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-full" style={{ animationPlayState: isRecording ? 'running' : 'paused' }}></div>
+                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-3/4" style={{ animationPlayState: streamer.isRecording ? 'running' : 'paused' }}></div>
+                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-full" style={{ animationPlayState: streamer.isRecording ? 'running' : 'paused' }}></div>
+                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-1/2" style={{ animationPlayState: streamer.isRecording ? 'running' : 'paused' }}></div>
+                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-full" style={{ animationPlayState: streamer.isRecording ? 'running' : 'paused' }}></div>
+                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-3/4" style={{ animationPlayState: streamer.isRecording ? 'running' : 'paused' }}></div>
+                            <div className="waveform-bar w-1.5 bg-white/90 rounded-full h-full" style={{ animationPlayState: streamer.isRecording ? 'running' : 'paused' }}></div>
                           </div>
                         </div>
                       </div>
