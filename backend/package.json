@@ -9,7 +9,10 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test-api": "tsx src/test-api.ts",
-    "test-guardrails": "tsx src/test-guardrails.ts"
+    "test-edgecases": "tsx src/test-edgecases.ts",
+    "test-guardrails": "tsx src/test-guardrails.ts",
+    "test-evals": "tsx src/test-evals.ts",
+    "test:all": "npm run test-edgecases && npm run test-guardrails && npm run test-evals"
   },
   "dependencies": {
     "@google/genai": "^2.6.0",
