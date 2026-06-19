@@ -13,7 +13,7 @@ export default function App() {
   const [modalScale, setModalScale] = useState(false);
   
   // Phase modes for testing: 'phase1' (push-to-talk) or 'phase2' (streaming)
-  const [phaseMode, setPhaseMode] = useState<'phase1' | 'phase2'>('phase1');
+  const [phaseMode, setPhaseMode] = useState<'phase1' | 'phase2'>('phase2');
   
   // Voice Modal Internal States (Greeting, Listening, Transcribing, Agent Speaking, Confirmed, Error)
   const [visualState, setVisualState] = useState<'greeting' | 'listening' | 'transcribing' | 'speaking' | 'confirmed' | 'error'>('greeting');
