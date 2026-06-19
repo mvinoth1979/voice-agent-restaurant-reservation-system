@@ -1,0 +1,9 @@
+{
+  "name": "voice-agent-restaurant-reservation-system",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm --prefix backend install",
+    "build": "npm --prefix backend run build",
+    "start": "npm --prefix backend run start"
+  }
+}
