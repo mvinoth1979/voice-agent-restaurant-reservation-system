@@ -114,6 +114,22 @@ export default function App() {
     }
   }, [messages, visualState]);
 
+  const setFemaleVoice = (utterance: SpeechSynthesisUtterance) => {
+    try {
+      const voices = window.speechSynthesis.getVoices();
+      const female = voices.find(v => 
+        v.lang.startsWith('en') && 
+        (v.name.toLowerCase().includes('female') || 
+         v.name.toLowerCase().includes('zira') || 
+         v.name.toLowerCase().includes('samantha') || 
+         v.name.toLowerCase().includes('google us english') ||
+         v.name.toLowerCase().includes('hazel') ||
+         v.name.toLowerCase().includes('microsoft'))
+      );
+      if (female) utterance.voice = female;
+    } catch (e) {}
+  };
+
   // Handle open/close animation of modal
   const openModal = () => {
     setModalOpen(true);
@@ -139,6 +155,7 @@ export default function App() {
       try {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(greetingText);
+        setFemaleVoice(utterance);
         utterance.onend = () => {
           setVisualState('greeting');
         };
@@ -192,7 +209,8 @@ export default function App() {
       for (let i = 0; i < len; i++) {
         bytes[i] = binaryString.charCodeAt(i);
       }
-      const blob = new Blob([bytes.buffer], { type: 'audio/mpeg' });
+      const isWav = base64String.startsWith('UklGR');
+      const blob = new Blob([bytes.buffer], { type: isWav ? 'audio/wav' : 'audio/mpeg' });
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       currentAudioRef.current = audio;
@@ -257,6 +275,7 @@ export default function App() {
         try {
           window.speechSynthesis.cancel(); // Stop any ongoing speech
           const utterance = new SpeechSynthesisUtterance(data.agent_text);
+          setFemaleVoice(utterance);
           utterance.onend = () => {
             setVisualState(phaseMode === 'phase2' ? 'listening' : 'greeting');
             if (phaseMode === 'phase2') {

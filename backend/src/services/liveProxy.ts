@@ -124,7 +124,7 @@ export const initVoiceSocketServer = (server: Server) => {
             data: {
               target_language_code: SARVAM_LANGUAGE,
               speaker: SARVAM_SPEAKER,
-              output_audio_codec: 'pcm',
+              output_audio_codec: 'linear16',
               speech_sample_rate: 16000
             }
           }));
@@ -146,8 +146,8 @@ export const initVoiceSocketServer = (server: Server) => {
           console.error('[liveProxy] Sarvam AI WebSocket error:', err);
         });
 
-        ttsWs.on('close', () => {
-          console.log('[liveProxy] Sarvam AI WebSocket closed.');
+        ttsWs.on('close', (code, reason) => {
+          console.log(`[liveProxy] Sarvam AI WebSocket closed. Code: ${code}, Reason: ${reason ? reason.toString() : 'None'}`);
         });
       } catch (err) {
         console.error('[liveProxy] Failed to connect to Sarvam AI:', err);
@@ -163,7 +163,7 @@ export const initVoiceSocketServer = (server: Server) => {
       // Send session setup frame
       const setupFrame = {
         setup: {
-          model: 'models/gemini-2.0-flash-exp',
+          model: 'models/gemini-2.5-flash-native-audio-latest',
           generationConfig: {
             responseModalities: ['TEXT'] // We want text output to stream to ElevenLabs
           },
@@ -263,8 +263,8 @@ export const initVoiceSocketServer = (server: Server) => {
       clientWs.close();
     });
 
-    geminiWs.on('close', () => {
-      console.log('[liveProxy] Gemini Live connection closed.');
+    geminiWs.on('close', (code, reason) => {
+      console.log(`[liveProxy] Gemini Live connection closed. Code: ${code}, Reason: ${reason ? reason.toString() : 'None'}`);
       clientWs.close();
     });
 
