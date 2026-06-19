@@ -15,11 +15,15 @@ import {
   appendSheetRow,
   updateSheetRowStatus
 } from './google.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
-const VOICE_ID = process.env.ELEVENLABS_VOICE_ID || '21m00Tcm4TlvDq8ikWAM'; 
 
+const SARVAM_API_KEY = process.env.SARVAM_API_KEY;
+const SARVAM_SPEAKER = (process.env.SARVAM_SPEAKER || 'anushka').trim().toLowerCase();
+const SARVAM_LANGUAGE = process.env.SARVAM_LANGUAGE || 'en-IN';
 export const initVoiceSocketServer = (server: Server) => {
   const wss = new WebSocketServer({ noServer: true });
 
@@ -40,7 +44,7 @@ export const initVoiceSocketServer = (server: Server) => {
     console.log('[liveProxy] Client connected to voice stream.');
     
     let geminiWs: WebSocket | null = null;
-    let elevenLabsWs: WebSocket | null = null;
+    let ttsWs: WebSocket | null = null;
     
     let accumulatedText = '';
     let actionBuffer = '';
@@ -61,9 +65,9 @@ export const initVoiceSocketServer = (server: Server) => {
         try { geminiWs.close(); } catch(e) {}
         geminiWs = null;
       }
-      if (elevenLabsWs) {
-        try { elevenLabsWs.close(); } catch(e) {}
-        elevenLabsWs = null;
+      if (ttsWs) {
+        try { ttsWs.close(); } catch(e) {}
+        ttsWs = null;
       }
     };
 
@@ -85,7 +89,7 @@ export const initVoiceSocketServer = (server: Server) => {
       return;
     }
 
-    const geminiUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidirectionalGenerateContent?key=${GEMINI_API_KEY}`;
+    const geminiUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${GEMINI_API_KEY}`;
     
     try {
       geminiWs = new WebSocket(geminiUrl);
@@ -96,58 +100,61 @@ export const initVoiceSocketServer = (server: Server) => {
       return;
     }
 
-    // 2. Initialize ElevenLabs stream helper
-    const connectElevenLabs = () => {
-      if (!ELEVENLABS_API_KEY) {
-        console.warn('[liveProxy] WARNING: ELEVENLABS_API_KEY is missing. Speech output will be bypassed.');
+    // 2. Initialize TTS stream helper (Sarvam AI)
+    const connectTTS = () => {
+      if (!SARVAM_API_KEY) {
+        console.warn('[liveProxy] WARNING: SARVAM_API_KEY is missing. Speech output will be bypassed.');
         return;
       }
 
-      const elUrl = `wss://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}/stream-input?model_id=eleven_turbo_v2_5&output_format=pcm_16000`;
-      
+      const sarvamUrl = 'wss://api.sarvam.ai/text-to-speech/ws?model=bulbul:v3';
+      console.log('[liveProxy] Connecting to Sarvam AI Live WebSocket...');
       try {
-        elevenLabsWs = new WebSocket(elUrl);
+        ttsWs = new WebSocket(sarvamUrl, {
+          headers: {
+            'api-subscription-key': SARVAM_API_KEY
+          }
+        });
         
-        elevenLabsWs.on('open', () => {
-          // Send handshake
-          elevenLabsWs?.send(JSON.stringify({
-            text: ' ',
-            xi_api_key: ELEVENLABS_API_KEY,
-            voice_settings: {
-              stability: 0.5,
-              similarity_boost: 0.75
-            },
-            generation_config: {
-              chunk_length_schedule: [120, 160, 250, 290]
+        ttsWs.on('open', () => {
+          console.log('[liveProxy] Connected to Sarvam AI Live TTS.');
+          // Send config handshake
+          ttsWs?.send(JSON.stringify({
+            type: 'config',
+            data: {
+              target_language_code: SARVAM_LANGUAGE,
+              speaker: SARVAM_SPEAKER,
+              output_audio_codec: 'pcm',
+              speech_sample_rate: 16000
             }
           }));
         });
 
-        elevenLabsWs.on('message', (data) => {
+        ttsWs.on('message', (data) => {
           try {
             const frame = JSON.parse(data.toString());
-            if (frame.audio) {
+            if (frame.type === 'audio' && frame.data && frame.data.audio) {
               // Send the raw PCM base64 back to client
-              sendToClient('audio', frame.audio);
+              sendToClient('audio', frame.data.audio);
             }
           } catch(e) {
-            console.error('[liveProxy] Error parsing ElevenLabs response:', e);
+            console.error('[liveProxy] Error parsing Sarvam AI response:', e);
           }
         });
 
-        elevenLabsWs.on('error', (err) => {
-          console.error('[liveProxy] ElevenLabs WebSocket error:', err);
+        ttsWs.on('error', (err) => {
+          console.error('[liveProxy] Sarvam AI WebSocket error:', err);
         });
 
-        elevenLabsWs.on('close', () => {
-          console.log('[liveProxy] ElevenLabs WebSocket closed.');
+        ttsWs.on('close', () => {
+          console.log('[liveProxy] Sarvam AI WebSocket closed.');
         });
-      } catch(err) {
-        console.error('[liveProxy] Failed to connect to ElevenLabs:', err);
+      } catch (err) {
+        console.error('[liveProxy] Failed to connect to Sarvam AI:', err);
       }
     };
 
-    connectElevenLabs();
+    connectTTS();
 
     // 3. Configure Gemini Live handlers
     geminiWs.on('open', () => {
@@ -209,11 +216,11 @@ export const initVoiceSocketServer = (server: Server) => {
                   accumulatedText += cleanText;
                   sendToClient('transcript', cleanText);
                   
-                  // Forward clean text to ElevenLabs stream
-                  if (elevenLabsWs && elevenLabsWs.readyState === WebSocket.OPEN) {
-                    elevenLabsWs.send(JSON.stringify({
-                      text: cleanText,
-                      try_trigger_generation: true
+                  // Forward clean text to TTS stream
+                  if (ttsWs && ttsWs.readyState === WebSocket.OPEN) {
+                    ttsWs.send(JSON.stringify({
+                      type: 'text',
+                      data: { text: cleanText }
                     }));
                   }
                 }
@@ -225,10 +232,10 @@ export const initVoiceSocketServer = (server: Server) => {
           if (response.serverContent.turnComplete) {
             console.log(`[liveProxy] Gemini turn complete: "${accumulatedText}"`);
             
-            // Flush ElevenLabs stream
-            if (elevenLabsWs && elevenLabsWs.readyState === WebSocket.OPEN) {
-              elevenLabsWs.send(JSON.stringify({
-                text: ''
+            // Flush TTS stream
+            if (ttsWs && ttsWs.readyState === WebSocket.OPEN) {
+              ttsWs.send(JSON.stringify({
+                type: 'flush'
               }));
             }
             accumulatedText = '';
@@ -239,10 +246,10 @@ export const initVoiceSocketServer = (server: Server) => {
         if (response.serverContent?.interrupted) {
           console.log('[liveProxy] Gemini live channel reports interruption.');
           sendToClient('interrupted', 'Gemini reports model interruption.');
-          // Restart ElevenLabs to dump active generation
-          if (elevenLabsWs) {
-            try { elevenLabsWs.close(); } catch(e) {}
-            connectElevenLabs();
+          // Restart TTS to dump active generation
+          if (ttsWs) {
+            try { ttsWs.close(); } catch(e) {}
+            connectTTS();
           }
         }
       } catch(err) {
@@ -299,10 +306,10 @@ export const initVoiceSocketServer = (server: Server) => {
           // VAD Interruption signal from client
           console.log('[liveProxy] Client triggered interruption.');
           
-          // Reset ElevenLabs socket
-          if (elevenLabsWs) {
-            try { elevenLabsWs.close(); } catch(e) {}
-            connectElevenLabs();
+          // Reset TTS socket
+          if (ttsWs) {
+            try { ttsWs.close(); } catch(e) {}
+            connectTTS();
           }
           
           // Send interrupt frame to Gemini Live if active

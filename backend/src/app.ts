@@ -16,7 +16,7 @@ import {
   appendSheetRow,
   updateSheetRowStatus
 } from './services/google.js';
-import { synthesizeText } from './services/elevenlabs.js';
+import { synthesizeTextSarvam } from './services/sarvam.js';
 
 const app = express();
 
@@ -73,7 +73,7 @@ app.post('/api/voice/process', upload.single('audio'), async (req, res) => {
 
     if (!userText.trim()) {
       const emptyText = "I did not catch that. Could you please repeat?";
-      const emptyAudio = await synthesizeText(emptyText);
+      const emptyAudio = await synthesizeTextSarvam(emptyText);
       res.json({
         transcript: "",
         agent_text: emptyText,
@@ -220,9 +220,9 @@ app.post('/api/voice/process', upload.single('audio'), async (req, res) => {
       }
     }
 
-    // 4. ElevenLabs Voice Synthesis (TTS)
+    // 4. Voice Synthesis (TTS)
     console.log(`[TTS] Synthesizing response: "${agentText.substring(0, 45)}..."`);
-    const agentAudio = await synthesizeText(agentText);
+    const agentAudio = await synthesizeTextSarvam(agentText);
 
     // 5. Update and package history
     let historyAgentText = agentText;
