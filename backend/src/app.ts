@@ -111,13 +111,15 @@ app.post('/api/voice/process', upload.single('audio'), async (req, res) => {
           if (success) {
             const code = generateCode();
             
-            // B. Write to Google Calendar
-            console.log(`[INTEGRATION] Writing calendar event for ${code}...`);
-            await createCalendarEvent(occasion, date, time, code);
+            // B. Write to Google Calendar in background
+            console.log(`[INTEGRATION] Writing calendar event for ${code} in background...`);
+            createCalendarEvent(occasion, date, time, code).catch(err => {
+              console.error("[app] Background Calendar write failed:", err);
+            });
             
-            // C. Write to Google Sheets
-            console.log(`[INTEGRATION] Appending log row in Google Sheets for ${code}...`);
-            await appendSheetRow(
+            // C. Write to Google Sheets in background
+            console.log(`[INTEGRATION] Appending log row in Google Sheets for ${code} in background...`);
+            appendSheetRow(
               new Date().toISOString(),
               date,
               time,
@@ -126,7 +128,9 @@ app.post('/api/voice/process', upload.single('audio'), async (req, res) => {
               code,
               'Confirmed',
               sessionId
-            );
+            ).catch(err => {
+              console.error("[app] Background Sheets write failed:", err);
+            });
             
             actionResult = {
               code,
@@ -161,13 +165,17 @@ app.post('/api/voice/process', upload.single('audio'), async (req, res) => {
         const success = releaseCode(normalizedCode);
         
         if (success) {
-          // Delete from Google Calendar
-          console.log(`[INTEGRATION] Deleting calendar event for ${normalizedCode}...`);
-          await deleteCalendarEvent(normalizedCode);
+          // Delete from Google Calendar in background
+          console.log(`[INTEGRATION] Deleting calendar event for ${normalizedCode} in background...`);
+          deleteCalendarEvent(normalizedCode).catch(err => {
+            console.error("[app] Background Calendar delete failed:", err);
+          });
           
-          // Update Status in Google Sheets
-          console.log(`[INTEGRATION] Updating status in Google Sheets for ${normalizedCode} to 'Cancelled'...`);
-          await updateSheetRowStatus(normalizedCode, 'Cancelled');
+          // Update Status in Google Sheets in background
+          console.log(`[INTEGRATION] Updating status in Google Sheets for ${normalizedCode} to 'Cancelled' in background...`);
+          updateSheetRowStatus(normalizedCode, 'Cancelled').catch(err => {
+            console.error("[app] Background Sheets update failed:", err);
+          });
         }
         
         actionResult = {
@@ -194,13 +202,17 @@ app.post('/api/voice/process', upload.single('audio'), async (req, res) => {
         if (available) {
           reserveSlot(date, time, "Standard Dining", 2);
           
-          // Update Google Calendar Event
-          console.log(`[INTEGRATION] Updating calendar event for reschedule: ${normalizedCode}...`);
-          await updateCalendarEvent(normalizedCode, date, time);
+          // Update Google Calendar Event in background
+          console.log(`[INTEGRATION] Updating calendar event for reschedule: ${normalizedCode} in background...`);
+          updateCalendarEvent(normalizedCode, date, time).catch(err => {
+            console.error("[app] Background Calendar reschedule failed:", err);
+          });
           
-          // Update Google Sheets Row
-          console.log(`[INTEGRATION] Updating spreadsheet row for reschedule: ${normalizedCode}...`);
-          await updateSheetRowStatus(normalizedCode, 'Rescheduled', date, time);
+          // Update Google Sheets Row in background
+          console.log(`[INTEGRATION] Updating spreadsheet row for reschedule: ${normalizedCode} in background...`);
+          updateSheetRowStatus(normalizedCode, 'Rescheduled', date, time).catch(err => {
+            console.error("[app] Background Sheets reschedule failed:", err);
+          });
 
           actionResult = {
             status: "rescheduled",

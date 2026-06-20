@@ -211,7 +211,7 @@ export const initVoiceSocketServer = (server: Server) => {
                   actionBuffer += ']';
                   
                   // Parse action token
-                  await processLiveAction(actionBuffer, sendToClient, sessionId);
+                  await processLiveAction(actionBuffer, sendToClient, sessionId, geminiWs);
                   actionBuffer = '';
                 } else {
                   if (inActionTag) {
@@ -324,7 +324,12 @@ export const initVoiceSocketServer = (server: Server) => {
 /**
  * Handle structural reservation actions emitted from the live model text stream.
  */
-async function processLiveAction(action: string, sendToClient: (event: string, data: any) => void, sessionId: string) {
+async function processLiveAction(
+  action: string, 
+  sendToClient: (event: string, data: any) => void, 
+  sessionId: string,
+  geminiWs: WebSocket | null
+) {
   console.log(`[liveProxy] Parsing action token: ${action}`);
   try {
     if (action.startsWith('[ACTION:BOOK_NEW:')) {
@@ -343,8 +348,11 @@ async function processLiveAction(action: string, sendToClient: (event: string, d
           const code = generateCode();
           console.log(`[liveProxy] Reservation created via streaming: ${code}`);
           
-          await createCalendarEvent(occasion, date, time, code);
-          await appendSheetRow(
+          // Write to Calendar and Sheets in background without blocking
+          createCalendarEvent(occasion, date, time, code).catch(err => {
+            console.error('[liveProxy] Background Calendar write failed:', err);
+          });
+          appendSheetRow(
             new Date().toISOString(),
             date,
             time,
@@ -353,7 +361,9 @@ async function processLiveAction(action: string, sendToClient: (event: string, d
             code,
             'Confirmed',
             sessionId
-          );
+          ).catch(err => {
+            console.error('[liveProxy] Background Sheets write failed:', err);
+          });
           
           sendToClient('action_result', {
             code,
@@ -361,7 +371,46 @@ async function processLiveAction(action: string, sendToClient: (event: string, d
             time_ist: `${time} (IST)`,
             occasion: `${occasion} (Party of ${partySize})`
           });
+
+          // Feed reservation code back to Gemini Live to speak to the user
+          if (geminiWs && geminiWs.readyState === WebSocket.OPEN) {
+            geminiWs.send(JSON.stringify({
+              clientContent: {
+                turns: [{
+                  role: 'user',
+                  parts: [{ text: `[SYSTEM: Reservation created successfully. Reservation code is ${code}. Please speak to confirm this code to the user and remind them of the 15-minute hold policy.]` }]
+                }],
+                turnComplete: true
+              }
+            }));
+          }
+        } else {
+          console.warn('[liveProxy] Failed to reserve slot in memory database.');
         }
+      } else {
+        const alternatives = getAlternativeSlots(date, occasion, partySize);
+        console.log(`[liveProxy] Slot unavailable. Alternatives: ${alternatives.join(', ')}`);
+
+        // Send unavailable feedback back to Gemini Live
+        if (geminiWs && geminiWs.readyState === WebSocket.OPEN) {
+          geminiWs.send(JSON.stringify({
+            clientContent: {
+              turns: [{
+                role: 'user',
+                parts: [{ text: `[SYSTEM: Reservation failed. The slot at ${time} IST on ${date} is fully booked. Please inform the user that it is unavailable and offer these alternative slots: ${alternatives.join(', ')}.]` }]
+              }],
+              turnComplete: true
+            }
+          }));
+        }
+
+        // Inform the client
+        sendToClient('action_result', {
+          status: 'unavailable',
+          date,
+          time,
+          alternatives
+        });
       }
     } 
     
@@ -374,14 +423,34 @@ async function processLiveAction(action: string, sendToClient: (event: string, d
       
       const success = releaseCode(normalizedCode);
       if (success) {
-        await deleteCalendarEvent(normalizedCode);
-        await updateSheetRowStatus(normalizedCode, 'Cancelled');
+        deleteCalendarEvent(normalizedCode).catch(err => {
+          console.error('[liveProxy] Background Calendar delete failed:', err);
+        });
+        updateSheetRowStatus(normalizedCode, 'Cancelled').catch(err => {
+          console.error('[liveProxy] Background Sheets status update failed:', err);
+        });
       }
       
       sendToClient('action_result', {
         status: 'cancelled',
         code: normalizedCode
       });
+
+      // Feed cancellation result back to Gemini Live
+      if (geminiWs && geminiWs.readyState === WebSocket.OPEN) {
+        geminiWs.send(JSON.stringify({
+          clientContent: {
+            turns: [{
+              role: 'user',
+              parts: [{ text: success 
+                ? `[SYSTEM: Cancellation successful for code ${normalizedCode}. Please confirm to the user that their reservation has been cancelled.]` 
+                : `[SYSTEM: Cancellation failed. Reservation code ${normalizedCode} was not found. Please inform the user and ask them to double check their code.]` 
+              }]
+            }],
+            turnComplete: true
+          }
+        }));
+      }
     } 
     
     else if (action.startsWith('[ACTION:RESCHEDULE:')) {
@@ -398,14 +467,55 @@ async function processLiveAction(action: string, sendToClient: (event: string, d
       const { available } = checkAvailability(date, time, "Standard Dining", 2);
       if (available) {
         reserveSlot(date, time, "Standard Dining", 2);
-        await updateCalendarEvent(normalizedCode, date, time);
-        await updateSheetRowStatus(normalizedCode, 'Rescheduled', date, time);
+        
+        updateCalendarEvent(normalizedCode, date, time).catch(err => {
+          console.error('[liveProxy] Background Calendar update failed:', err);
+        });
+        updateSheetRowStatus(normalizedCode, 'Rescheduled', date, time).catch(err => {
+          console.error('[liveProxy] Background Sheets update failed:', err);
+        });
         
         sendToClient('action_result', {
           status: 'rescheduled',
           code: normalizedCode,
           date,
           time_ist: `${time} (IST)`
+        });
+
+        // Feed reschedule success back to Gemini Live
+        if (geminiWs && geminiWs.readyState === WebSocket.OPEN) {
+          geminiWs.send(JSON.stringify({
+            clientContent: {
+              turns: [{
+                role: 'user',
+                parts: [{ text: `[SYSTEM: Reschedule successful. Reservation ${normalizedCode} moved to ${date} at ${time} IST. Please confirm this to the user and remind them of the 15-minute hold policy.]` }]
+              }],
+              turnComplete: true
+            }
+          }));
+        }
+      } else {
+        const alternatives = getAlternativeSlots(date, "Standard Dining", 2);
+        console.log(`[liveProxy] Reschedule failed (slot taken). Alternatives: ${alternatives.join(', ')}`);
+
+        // Feed reschedule failure back to Gemini Live
+        if (geminiWs && geminiWs.readyState === WebSocket.OPEN) {
+          geminiWs.send(JSON.stringify({
+            clientContent: {
+              turns: [{
+                role: 'user',
+                parts: [{ text: `[SYSTEM: Reschedule failed. The slot at ${time} IST on ${date} is fully booked. Please inform the user that it is unavailable and offer these alternative slots: ${alternatives.join(', ')}.]` }]
+              }],
+              turnComplete: true
+            }
+          }));
+        }
+
+        sendToClient('action_result', {
+          status: 'unavailable',
+          date,
+          time,
+          alternatives
         });
       }
     }
