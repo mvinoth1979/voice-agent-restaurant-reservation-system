@@ -144,6 +144,28 @@ export const useAudioStreamer = ({
     return buffer;
   };
 
+  const ensureAudioContextReady = async () => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({
+        sampleRate: 24000
+      });
+      nextPlayTimeRef.current = audioContextRef.current.currentTime;
+    }
+
+    if (audioContextRef.current.state === 'suspended') {
+      await audioContextRef.current.resume();
+    }
+
+    return audioContextRef.current;
+  };
+
+  const ensureRecordingContextReady = async () => {
+    if (!recordContextRef.current) return;
+    if (recordContextRef.current.state === 'suspended') {
+      await recordContextRef.current.resume();
+    }
+  };
+
   // Convert binary ArrayBuffer to Base64 string
   const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
     let binary = '';
@@ -174,6 +196,7 @@ export const useAudioStreamer = ({
         sampleRate: 16000
       });
       recordContextRef.current = recordContext;
+      await ensureRecordingContextReady();
 
       const source = recordContext.createMediaStreamSource(stream);
       
@@ -249,16 +272,9 @@ export const useAudioStreamer = ({
   };
 
   // 3. Gapless Audio Queue Playback
-  const handleIncomingAudio = (base64String: string) => {
+  const handleIncomingAudio = async (base64String: string) => {
     try {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({
-          sampleRate: 16000
-        });
-        nextPlayTimeRef.current = audioContextRef.current.currentTime;
-      }
-      
-      const audioCtx = audioContextRef.current;
+      const audioCtx = await ensureAudioContextReady();
       
       // Decode base64 PCM string to Int16
       const binaryString = window.atob(base64String);
@@ -275,7 +291,7 @@ export const useAudioStreamer = ({
       }
 
       // Create browser audio buffer
-      const audioBuffer = audioCtx.createBuffer(1, float32Samples.length, 16000);
+      const audioBuffer = audioCtx.createBuffer(1, float32Samples.length, 24000);
       audioBuffer.copyToChannel(float32Samples, 0);
 
       // Schedule play source node gaplessly

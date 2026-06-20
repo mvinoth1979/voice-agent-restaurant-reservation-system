@@ -20,3 +20,5 @@ backend/src/data/*.json
 *.log
 .DS_Store
 Thumbs.db
+
+.vercel

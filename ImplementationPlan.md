@@ -261,4 +261,20 @@ To ensure a seamless transition between the 4 sequential Antigravity sessions, e
   - Push the repository remote to GitHub.
   - Deploy the backend on Railway and the frontend on Vercel.
 
+### ## Bugfix Update: Streaming Option Modality Configuration (2026-06-20)
+
+- **Completed Work:**
+  - Resolved Code 1007 WebSocket error where Gemini Live rejected `responseModalities: ['TEXT']` on native audio models.
+  - Configured `models/gemini-2.5-flash-native-audio-latest` with `responseModalities: ['AUDIO']` and enabled `output_audio_transcription: {}` directly under the `setup` block in [liveProxy.ts](file:///d:/SS/AI/Voice%20Agent%20-%20Restaurant%20reservation%20system/backend/src/services/liveProxy.ts).
+  - Updated the proxy handlers to stream Gemini's native synthesized audio (`inlineData.data`) and text transcription (`outputTranscription.text`) directly to the client. This bypasses the need for an external text-to-speech API (like Sarvam AI/ElevenLabs) for Phase 2 conversation turns, significantly reducing latency.
+  - Modified the browser playback sample rate inside [useAudioStreamer.ts](file:///d:/SS/AI/Voice%20Agent%20-%20Restaurant%20reservation%20system/frontend/src/hooks/useAudioStreamer.ts) from `16000` to `24000` to match the 24kHz native audio output of Gemini Live, ensuring voice speech plays back at natural speed.
+  - Verified local end-to-end conversation flows successfully via the browser subagent in streaming mode.
+- **Current State:**
+  - Frontend and backend compile cleanly and run in the local development environment.
+  - Bidirectional voice connection to Gemini Live remains stable.
+- **Next Steps:**
+  - Push the local changes to your remote GitHub repository.
+  - Deploy the backend on Railway and the frontend on Vercel as described in [DEPLOYMENT.md](file:///d:/SS/AI/Voice%20Agent%20-%20Restaurant%20reservation%20system/DEPLOYMENT.md).
+
+
 

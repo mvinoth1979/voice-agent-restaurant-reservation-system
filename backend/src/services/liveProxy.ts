@@ -165,11 +165,12 @@ export const initVoiceSocketServer = (server: Server) => {
         setup: {
           model: 'models/gemini-2.5-flash-native-audio-latest',
           generationConfig: {
-            responseModalities: ['TEXT'] // We want text output to stream to ElevenLabs
+            responseModalities: ['AUDIO']
           },
           systemInstruction: {
             parts: [{ text: SYSTEM_PROMPT }]
-          }
+          },
+          output_audio_transcription: {}
         }
       };
       
@@ -183,47 +184,47 @@ export const initVoiceSocketServer = (server: Server) => {
         
         // Handle Gemini streaming content
         if (response.serverContent) {
+          // Send audio chunks to client if present
           const modelTurn = response.serverContent.modelTurn;
           if (modelTurn && modelTurn.parts) {
             for (const part of modelTurn.parts) {
-              if (part.text) {
-                const text = part.text;
-                
-                // Parse and strip action tags in real-time
-                let cleanText = '';
-                for (let i = 0; i < text.length; i++) {
-                  const char = text[i];
-                  if (char === '[') {
-                    inActionTag = true;
-                    actionBuffer = '[';
-                  } else if (char === ']') {
-                    inActionTag = false;
-                    actionBuffer += ']';
-                    
-                    // Parse action token
-                    await processLiveAction(actionBuffer, sendToClient, sessionId);
-                    actionBuffer = '';
-                  } else {
-                    if (inActionTag) {
-                      actionBuffer += char;
-                    } else {
-                      cleanText += char;
-                    }
-                  }
-                }
-                
-                if (cleanText) {
-                  accumulatedText += cleanText;
-                  sendToClient('transcript', cleanText);
+              if (part.inlineData) {
+                // Send the raw PCM base64 back to client
+                sendToClient('audio', part.inlineData.data);
+              }
+            }
+          }
+
+          // Handle transcription if present
+          if (response.serverContent.outputTranscription) {
+            const text = response.serverContent.outputTranscription.text;
+            if (text) {
+              // Parse and strip action tags in real-time
+              let cleanText = '';
+              for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '[') {
+                  inActionTag = true;
+                  actionBuffer = '[';
+                } else if (char === ']') {
+                  inActionTag = false;
+                  actionBuffer += ']';
                   
-                  // Forward clean text to TTS stream
-                  if (ttsWs && ttsWs.readyState === WebSocket.OPEN) {
-                    ttsWs.send(JSON.stringify({
-                      type: 'text',
-                      data: { text: cleanText }
-                    }));
+                  // Parse action token
+                  await processLiveAction(actionBuffer, sendToClient, sessionId);
+                  actionBuffer = '';
+                } else {
+                  if (inActionTag) {
+                    actionBuffer += char;
+                  } else {
+                    cleanText += char;
                   }
                 }
+              }
+              
+              if (cleanText) {
+                accumulatedText += cleanText;
+                sendToClient('transcript', cleanText);
               }
             }
           }
@@ -231,13 +232,6 @@ export const initVoiceSocketServer = (server: Server) => {
           // Complete Turn
           if (response.serverContent.turnComplete) {
             console.log(`[liveProxy] Gemini turn complete: "${accumulatedText}"`);
-            
-            // Flush TTS stream
-            if (ttsWs && ttsWs.readyState === WebSocket.OPEN) {
-              ttsWs.send(JSON.stringify({
-                type: 'flush'
-              }));
-            }
             accumulatedText = '';
           }
         }
@@ -246,11 +240,6 @@ export const initVoiceSocketServer = (server: Server) => {
         if (response.serverContent?.interrupted) {
           console.log('[liveProxy] Gemini live channel reports interruption.');
           sendToClient('interrupted', 'Gemini reports model interruption.');
-          // Restart TTS to dump active generation
-          if (ttsWs) {
-            try { ttsWs.close(); } catch(e) {}
-            connectTTS();
-          }
         }
       } catch(err) {
         console.error('[liveProxy] Error parsing Gemini Live response:', err);
