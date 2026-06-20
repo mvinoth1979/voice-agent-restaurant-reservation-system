@@ -850,7 +850,7 @@ export default function App() {
                   </div>
 
                   {/* Text transcription input box (For Phase 1 fallback or verification) */}
-                  {phaseMode === 'phase1' && (
+                  {true && (
                     <div className="w-full flex gap-2">
                       <input 
                         type="text" 
